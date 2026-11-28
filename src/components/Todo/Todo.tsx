@@ -56,6 +56,29 @@ export const Todo = ({
     setEditing(false);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+
+      cancelEditing();
+    }
+  };
+
+  const handleBlur = () => {
+    if (skipBlurSave.current) {
+      skipBlurSave.current = false;
+
+      return;
+    }
+
+    void saveChangedTodo();
+  };
+
+  const handleDoubleClick = () => {
+    setTodoTitle(todo.title);
+    setEditing(true);
+  };
+
   return (
     <div
       data-cy="Todo"
@@ -90,32 +113,15 @@ export const Todo = ({
             ref={todoTitleInput}
             value={todoTitle}
             onChange={event => setTodoTitle(event.target.value)}
-            onKeyDown={event => {
-              if (event.key === 'Escape') {
-                event.preventDefault();
-
-                cancelEditing();
-              }
-            }}
-            onBlur={() => {
-              if (skipBlurSave.current) {
-                skipBlurSave.current = false;
-
-                return;
-              }
-
-              void saveChangedTodo();
-            }}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
           />
         </form>
       ) : (
         <span
           data-cy="TodoTitle"
           className="todo__title"
-          onDoubleClick={() => {
-            setTodoTitle(todo.title);
-            setEditing(true);
-          }}
+          onDoubleClick={handleDoubleClick}
         >
           {todo.title}
         </span>
